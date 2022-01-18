@@ -1,23 +1,33 @@
-const { Sequelize, DataTypes } = require('sequelize');
-var koneksi = require('../koneksi.js');
-const Obat = require('./obats.js');
-const Transaksi_Obat = require('./transaksi_obat.js');
+const { Sequelize, DataTypes, Model } = require('sequelize');
+var koneksi = require("../koneksi.js");
 
-const Transaksi_Obat_Detail = koneksi.define('Transaksi_Obat_Detail', {
+
+const Transaksi_Obat_Detail = koneksi.define('transaksi_obat_detail', {
+  id: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  id_transaksi_obat: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
+  id_obat: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
   jumlah: {
-    type: DataTypes.INTEGER,
+    type: Sequelize.INTEGER,
     allowNull: false
   },
   harga: {
-    type: DataTypes.INTEGER,
+    type: Sequelize.INTEGER,
     allowNull: false
   },
-  
 }, {
+    timestamps: true,
     freezeTableName: true
 });
-
-Transaksi_Obat_Detail.belongsTo(Transaksi_Obat, {foreignKey: 'id_transaksi_obat'});
-Transaksi_Obat_Detail.belongsTo(Obat, {foreignKey: 'id_obat'});
 
 module.exports = Transaksi_Obat_Detail;

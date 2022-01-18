@@ -1,18 +1,27 @@
-const { Sequelize, DataTypes } = require('sequelize');
-var koneksi = require('../koneksi.js');
 
-const Obat = koneksi.define('Obat', {
+var koneksi = require("../koneksi.js");
+const Sequelize = require('sequelize');
+
+const Obat = koneksi.define('obat',   {
+  id: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+  autoIncrement: true
+  },
   nama: {
-    type: DataTypes.STRING,
+    type: Sequelize.STRING,
     allowNull: false
   },
   harga: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  
-}, {
-    freezeTableName: true
-});
+  type: Sequelize.INTEGER,
+  allowNull: false,
+},},
+{
+  timestamps: true,
+  freezeTableName: true
+}
+);
+
 
 module.exports = Obat;

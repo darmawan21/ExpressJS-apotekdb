@@ -1,78 +1,94 @@
 var express = require('express');
 var router = express.Router();
-var Transaksi_Obat_Detail = require("../models/transaksi_obat_detail");
+const axios = require('axios')
+var Obat = require('../models/obats');
+var TransaksiObat = require('../models/transaksi_obat');
+var TransaksiObatDetail = require('../models/transaksi_obat_detail');
 
-/*TAMPIL DATA Transaksi_Obat_Detail. */
 router.get('/', function(req, res, next) {
-Transaksi_Obat_Detail.findAndCountAll().then(data => {
-    res.json({
-      status: true,
-      pesan: "Berhasil Tampil",
-      data:data.rows,
-      count: data.count
-    });
-  }).catch(salahnya=>{
-    res.json({
-      status: false,
-      pesan: "Gagal Tampil: " + salahnya.message,
-      data: []
-    });
-  });
+	TransaksiObatDetail.findAll({raw:true}).then( async data=> {
+	
+	  await Promise.all(data.map( async (item)=>{
+		// baca Transaksi Periksa
+		const transaksi_obat = await TransaksiObat.findByPk(item.id_transaksi_obat);
+	
+		// baca Jenis Penunjang
+		const obat = await Obat.findByPk(item.id_obat);
+	
+		// update itemTampil
+		item['biaya_transaksi_obat'] =  transaksi_obat.id_transaksi_obat;
+		item['nama_obat'] = obat.nama;
+    	item['harga_obat'] = obat.harga;
+
+	  }));
+	
+	  res.json({
+		status:true,
+		pesan: "Berhasil Tampil",
+		data:data
+	  });
+	
+	}).catch ( err => {
+	  res.json({
+		status:false,
+		pesan: "Gagal tampil: " + err.message,
+		data:[]
+	  })
+	});
 });
 
-/* TAMBAH DATA Transaksi_Obat_Detail. */
-router.post('/', function(req, res, next) {
-Transaksi_Obat_Detail.create(req.body).then(data => {
-    res.json({
-      status: true,
-      pesan: "Berhasil Ditambah",
-      data:data
+router.post('/',function(req,res,next){
+
+    TransaksiObatDetail.create(req.body).then( data=>{
+        res.json({
+            status:true,
+            pesan:"Berhasil Tambah",
+            data:data
+        });
+    }).catch( err=>{
+        res.json({
+            status: false,
+            pesan: "Gagal Tambah: " + err.message,
+            data:[]
+        });
     });
-  }).catch(salahnya=>{
-    res.json({
-      status: false,
-      pesan: "Gagal Tampil: " + salahnya.message,
-      data: req.body
-    });
-  });
+
 });
 
-/* UBAH DATA Transaksi_Obat_Detail. */
-router.put('/', function(req, res, next) {
-Transaksi_Obat_Detail.update(req.body, {
-    where : {id:req.body.id}
-  }).then(data => {
-    res.json({
-      status: true,
-      pesan: "Berhasil Ubah",
-      data:data
-    });
-  }).catch(salahnya=>{
-    res.json({
-      status: false,
-      pesan: "Gagal Ubah: " + salahnya.message,
-      data:req.body
-    });
-  });
+router.put('/',function(req,res,next){
+	TransaksiObatDetail.update(req.body,{
+		where:{id:req.body.id}
+	}).then( ()=>{
+		res.json({
+			status:true,
+			pesan:"Berhasil Ubah",
+			data:[]
+		});
+	}).catch( err=>{
+		res.json({
+			status: false,
+			pesan: "Gagal Ubah: " + err.message,
+			data:[]
+		});
+	});
 });
 
-/* HAPUS DATA Transaksi_Obat_Detail. */
-router.delete('/', function(req, res, next) {
-Transaksi_Obat_Detail.destroy({
-    where : {id:req.body.id}
-  }).then(data => {
-    res.json({
-      status: true,
-      pesan: "Berhasil Hapus",
-      data:data
-    });
-  }).catch(salahnya=>{
-    res.json({
-      status: false,
-      pesan: "Gagal Hapus: " + salahnya.message,
-      data:req.body
-    });
-  });
+router.delete('/',function(req,res,next){
+	TransaksiObatDetail.destroy({
+		where:{id:req.body.id}
+	}).then( ()=>{
+		res.json({
+			status:true,
+			pesan:"Berhasil Hapus",
+			data:[]
+		});
+	}).catch( err=>{
+		res.json({
+			status: false,
+			pesan: "Gagal Hapus: " + err.message,
+			data:[]
+		});
+	});
 });
 
 module.exports = router;
